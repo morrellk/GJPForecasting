@@ -1,7 +1,7 @@
 ##   getGJPquestions.R
 ##
-##   Function to read the question page at https://www.goodjudgmentproject.com/
-##   and pull out the questions, then write them to a csv file.
+##   Function to read a question page at https://www.goodjudgmentproject.com/
+##   and pull out the questions on that page, then write them to a csv file.
 ##
 ##   Why?  Because I want to get them into a spreadsheet a little easier.
 ##
@@ -17,13 +17,23 @@
 ##
 ##   Output:
 ##        datafrome containing:
-##             question title
-##             question ID
-##             current probabiliy est for binary questions
-##             closing date
+##             question number (number extracted from question id)
+##             closing date    (currently as string, UTC)
+##             question title  (short text of question)
+##             current probability est for binary questions, nothing for multi
+## 
+##   Packages:
+##        loads and uses XML library
 ##
 ##   Usage:
 ##        qlist <- getGJPquestions("fileToRead", "outputfilename")
+##
+##   Possible updates to make:
+##        create a version to pull all questions, not just one page
+##        pull the predictions correctly for multi-category questions
+##        version to use the queries?
+##        add in automatic download/copy of page source using download.file?
+##
 ##
 ##   21-Sep-2015   K. Morrell
 ##
@@ -43,36 +53,34 @@ getGJPquestions <- function(qloc="questions.htm", outFile="GJPquestions.csv") {
      ##   info[1][[1]]$.attrs["id"]  gives the question id
      ##   and so does:
      ##   info[[1]]$.attrs["id"]
-     ##
-     ##   also, can reassign the value as:
-     ##   id1 <- as.character(info[[1]]$.attrs["id"])
      
      ##  Get a list of the questions on the page and id's
      qlist <- sapply(info, function(x) as.character(x$div$a$text))
      idlist <- sapply(info, function(x) as.character(x$.attrs["id"]))
      
-     ## if can figure out how to get the closing date and the current prediction...
+     ##  Pull out just the question number 
+     ##  (id's currently in format "question_#")
+     qnum <- as.numeric(sapply(strsplit(idlist,"_"), function(x) x[2]))
+          
+     ##  This at least pulls the predictions for binary questions, but the category
+     ## ones are a mess.  Pull them anyway, so that lists align. Currently
+     ## these are the only two types being used, but may need to change later.
      
-     ##  This at least gives the predictions for binary ones, but the category
-     ## ones are a mess:
      vals <- xpathSApply(html,
         "//div[@class='binary-probability-value'] | //div[@class='consensus-donut-graph']",
         xmlValue)
-     p_loc <- regexpr("%", vals)
-     p_val <- 0
-     for(i in 1:length(vals)){
-          p_val[i] <- substr(vals[i], p_loc[i]-2, p_loc[i])
-     }
+     p_end <- regexpr("%", vals)
+     p_start <- p_end-2
+     p_val <- substr(vals, p_start, p_end)
 
-     ##  Well, can pull out the "Closing" with regexpr, then loop
+     ##  Well, can pull out the "Closing:" with regexpr, then do all
      cl_loc <- regexpr("Closing:", info)
-     cl_date = ""
-     for(i in 1:length(info)){
-          cl_date[i] <- substr(info[i],cl_loc[i]+22,cl_loc[i]+45)
-     }
+     cl_start <- cl_loc+22
+     cl_end <- cl_loc+45
+     cl_date <- substr(info, cl_start, cl_end)
      
      ## Create a dataframe
-     qinfo <- data.frame(qlist,idlist,p_val,cl_date, stringsAsFactors=FALSE)
+     qinfo <- data.frame(qnum, cl_date, qlist, p_val, stringsAsFactors=FALSE)
      
      ##  Output as CSV
      write.csv( qinfo, outFile)
