@@ -12,5 +12,9 @@ Notify me here if there is something you want written/changed - will do if I can
      + puts info in a data frame, returns it, and also writes to a CSV file
      + see file header for comments on usage, arguments to pass.
      
+* refugees_2015.xlsx
+     + Excel workbok for estimation of refugees arriving in Europe by sea, 2015
+     + update red-outlined cells with most recent data from http://data.unhcr.org/mediterranean/regional.php
+     
 
 
