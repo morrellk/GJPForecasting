@@ -73,11 +73,8 @@ getGJPquestions <- function(qloc="questions.htm", outFile="GJPquestions.csv") {
      p_start <- p_end-2
      p_val <- substr(vals, p_start, p_end)
 
-     ##  Well, can pull out the "Closing:" with regexpr, then do all
-     cl_loc <- regexpr("Closing:", info)
-     cl_start <- cl_loc+22
-     cl_end <- cl_loc+45
-     cl_date <- substr(info, cl_start, cl_end)
+     ##  Dates now using data-localizable-timestamp
+     cl_date <- xpathSApply(html, "//span[@data-localizable-timestamp]",xmlValue)
      
      ## Create a dataframe
      qinfo <- data.frame(qnum, cl_date, qlist, p_val, stringsAsFactors=FALSE)
