@@ -52,7 +52,7 @@ scoreOrderedCat <- function(plist){
      ##   if result is i or less, 1,
      ##   Trouble getting mapply to work correctly, anyway, easier to read
      ##   this way.
-     pair_val <- array(dim=c(2,4,5))
+     pair_val <- array(dim=c(2, npair, ncat))
      
      for (r in 1:ncat){
           paira <- sapply(1:npair, function(x) r<=x)
