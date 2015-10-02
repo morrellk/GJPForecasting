@@ -15,6 +15,22 @@ Notify me here if there is something you want written/changed - will do if I can
 * refugees_2015.xlsx
      + Excel workbok for estimation of refugees arriving in Europe by sea, 2015
      + update red-outlined cells with most recent data from http://data.unhcr.org/mediterranean/regional.php
+
+* "Bracket refugees.pdf"," Bracket refugees.csv"
+     + PDF and CSV files for "Bracket" sheet from refugees_2015.xlsx.
+     + Do not have all features in the Excel worksheet, but wanted different format options.
+     
+* Greece.pdf
+     + PDF file for "Greece" sheet from refugees_2015.xlsx.  
+     + Just has text for current version of the Excel sheet.
+     
+* scoreOrderedCat.R
+     + ordered categorical scoring
+     + provides Brier score estimates for all potential outcomes
+     + input is vector of probability estimates, length = # result categories
+     + use for seeing how different probabilities affect ordered categorical score
+     + doesn't account for consensus forecast
+     + doesn't track over time
      
 
 
