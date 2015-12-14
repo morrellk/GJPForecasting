@@ -8,6 +8,7 @@
 ##   "yes" and "no" results.
 ##
 ##   Packages: lubridate
+##   Requires: scoreOrderedCat.R 
 ##   Inputs:
 ##        f_dates: list of dates for each forecast entered, as strings in mdy format,
 ##             eg: mm/dd/yy  Will be processed with lubridate function mdy().
@@ -18,17 +19,21 @@
 ##             Default is c("yes","no")
 ##        filename: name of file to put plots intoe, expects png at present.
 ##             Default is "forecast_plot.png"
+##        ordered: Boolean indicating whether to use ordered categorical 
+##             scoring or not.  Default is FALSE.
 ##
 ##   Outputs:
 ##        PNG file containing 2 plots
 ##   Returns: filename for plot file
-##
+##   
 ##   30-NOV-2015  K. Morrell 
+##   14-DEC-2015  K. Morrell Updated to add ordered categorical scoring
 ##
 
 plot_forecast <- function(f_dates, f_vals, f_names=c("Yes","No"), 
-                          filename="forecast_plot.png"){
+                          filename="forecast_plot.png", ordered=FALSE){
      library(lubridate)
+     source("scoreOrderedCat.R")
      
      ##   Process the dates, generate lists will need below and in plot
      f_dates <- mdy(f_dates)
@@ -51,8 +56,21 @@ plot_forecast <- function(f_dates, f_vals, f_names=c("Yes","No"),
           all_f_vals <- rep(f_vals, how_long)
      }
      else{
-          part <- matrix(data=sapply(f_vals, function(x) ((1-x)^2 + (0-(1-x))^2)), 
-                         nrow=nrow(f_vals)) 
+          if (ordered){
+               ## This is branch where multi-category and using ordered scoring
+               ## For instance, any continuous value broken into discrete bins
+               ## such as oil price, date for an event to occur
+               part <- matrix(data=sapply(c(1:ncol(f_vals)), 
+                              function(x) scoreOrderedCat(f_vals[,x])), 
+                              nrow=nrow(f_vals))     
+          }
+          else {
+               ## This is branch where multi-category but not ordered scoring
+               ## For instance, if picking between individuals in an election
+               part <- matrix(data=sapply(f_vals, 
+                              function(x) ((1-x)^2 + (0-(1-x))^2)), 
+                              nrow=nrow(f_vals)) 
+          }
           ## This ends up with forecasts expanded in columns rather than rows
           all_f_vals <- sapply(c(1:nrow(f_vals)), 
                                function(x) rep(f_vals[x,],how_long))
@@ -74,10 +92,12 @@ plot_forecast <- function(f_dates, f_vals, f_names=c("Yes","No"),
           each_day <- t(each_day)
           sum_each_day <- sapply(c(1:nrow(daily)), 
                                  function(x) cumsum(each_day[x,]))
+          sapply(c(1:ncol(sum_each_day)), function(x) print(sum_each_day[nrow(sum_each_day),x]))
      }
      
      forecast <- data.frame(all_f_dates, t(all_f_vals))
      scores <- data.frame(all_f_dates, t(each_day), sum_each_day)
+     
      
      ## Send the plots to a file (png? pdf?)
      png(filename, width=500, height=500, res=72)
@@ -116,5 +136,6 @@ plot_forecast <- function(f_dates, f_vals, f_names=c("Yes","No"),
      }
      dev.off()  
      palette("default")
+     
      return(filename)
 }

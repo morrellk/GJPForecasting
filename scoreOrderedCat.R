@@ -36,7 +36,6 @@ scoreOrderedCat <- function(plist){
      val <- sapply(c(1:npair), function(x) c(sum(plist[1:x]),
                                              sum(plist[(x+1):ncat])))
      val <- t(val)
-     
      ##  Should check that val <1, otherwise divide by 100
      if (any(val>1)) val <- val/100
      
