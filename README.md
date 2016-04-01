@@ -6,6 +6,13 @@ Intended to contain code snippets and tools that I've written for this year.  No
 Notify me here if there is something you want written/changed - will do if I can & have time.
 
 ### Files
+* acled_country_mk.R
+     + input: ACLED data in dataframe output by acled.importer.R 
+     + filters for a specific country, within the last year
+     + attempts to remove events associated with on-going episode of mass killing
+     + output: tables of events created at different stages in process, including
+tally of fatalities by actor1 (perpetrator) and actor2 (victim)
+
 * plot_forecast.R
      + plots forecast and effect on Brier scores over forecast period
      + input: list of forecast dates (as strings), array of forecast values
@@ -19,14 +26,14 @@ Notify me here if there is something you want written/changed - will do if I can
      + see file header for comments on usage, arguments to pass.
      
 * refugees_2015.xlsx (11/30/15: Not up to date)
-     + Excel workbok for estimation of refugees arriving in Europe by sea, 2015
+     + Excel workbook for estimation of refugees arriving in Europe by sea, 2015
      + update red-outlined cells with most recent data from http://data.unhcr.org/mediterranean/regional.php
 
 * "Bracket refugees.pdf"," Bracket refugees.csv" (11/30/15: Not up to date)
      + PDF and CSV files for "Bracket" sheet from refugees_2015.xlsx.
      + Do not have all features in the Excel worksheet, but wanted different format options.
      
-* Greece.pdf (11/30/15: Not up to daate)
+* Greece.pdf (11/30/15: Not up to date)
      + PDF file for "Greece" sheet from refugees_2015.xlsx.  
      + Just has text for current version of the Excel sheet.
      
