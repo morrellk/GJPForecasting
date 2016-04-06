@@ -143,8 +143,8 @@ acled_cntry_remove_ongoing <- function(country_tbl, actor, actor_num){
 #  and don't want to change acled.importer.R to pass in filename - that may
 #  be best choice though, or not deleting it from workspace.
 
-acled_country_mk <- function(events_df, c="Nigeria", rem_actor_name,
-                             rem_actor_num){
+acled_country_mk <- function(events_df, c="Nigeria", rem_actor_name="",
+                             rem_actor_num=0){
      # Get country code for the name
      c_code <- countrycode(c, "country.name", "cown", warn=FALSE)
      
@@ -169,7 +169,8 @@ acled_country_mk <- function(events_df, c="Nigeria", rem_actor_name,
      
      # If on-going episodes defined, take those actors out.  Otherwise,
      # events.wo is same as events.recent, ungrouped.
-     if(exists(rem_actor_name, inherits=FALSE)){
+     
+     if(rem_actor_num[1] > 0){
           events.wo <- acled_cntry_remove_ongoing(events.recent, rem_actor_name, 
                                              rem_actor_num)
      } else {
