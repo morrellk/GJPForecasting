@@ -94,13 +94,13 @@ acled_country <- function(events_df, c = "Nigeria"){
 
 
 # acled_cntry_recent_by_actor takes output from acled_country and
-#    - filters down to just events in the past year
+#    - filters down to just events in the past year (from end date of file)
 #    - groups by actor
-acled_cntry_recent_by_actor <- function(country_tbl) {
+acled_cntry_recent_by_actor <- function(country_tbl, fdate) {
      # Given a table of the form output from acled_country, extract only the last
      # year's worth of data and only those 
      # events with fatalities. Plot, grouped by actor1 and return
-     start <- today("GMT") - years(1)
+     start <- ymd(fdate) - years(1)
      
      events.new_a1 <- country_tbl %>%
           mutate(., event_date=paste(year,month, day, sep="-")) %>%
@@ -137,11 +137,8 @@ acled_cntry_remove_ongoing <- function(country_tbl, actor, actor_num){
 # acled_country_mk calls various other functions in order to
 # generate the different dataframes and tables for the country.
 # These are then saved to a file and can be loaded into the workspace.
-#  One issue with this function is that it defines recent as within a year
-#  of the current date - file may have been collected earlier so may result in
-#  some data left out.  Haven't decided whether would be better to do something else
-#  and don't want to change acled.importer.R to pass in filename - that may
-#  be best choice though, or not deleting it from workspace.
+#  Expects the filename to be in the workspace so that can get date of the
+# file from that.  
 
 acled_country_mk <- function(events_df, c="Nigeria", rem_actor_name="",
                              rem_actor_num=0){
@@ -164,8 +161,21 @@ acled_country_mk <- function(events_df, c="Nigeria", rem_actor_name="",
           # Remove events that are battles, include only events with fatalities
           filter(., !grepl("Battle", event_type, ignore.case=TRUE)) 
      
+     # Determine end date of file 
+     file_sub <- unlist(str_split(realtime.file, "csv.csv"))[1]
+     endchar <- nchar(file_sub)
+     if(grepl("_",str_sub(file_sub,endchar,endchar))){
+          startchar <- endchar-8
+          endchar <- endchar-1
+     }
+     else {
+          startchar <- endchar-7
+     }
+     file_date <- str_sub(file_sub, startchar, endchar)
+     
+     
      # Filter to just the most recent year     
-     events.recent <- acled_cntry_recent_by_actor(events.country.fatal)
+     events.recent <- acled_cntry_recent_by_actor(events.country.fatal, file_date)
      
      # If on-going episodes defined, take those actors out.  Otherwise,
      # events.wo is same as events.recent, ungrouped.
@@ -195,11 +205,37 @@ acled_country_mk <- function(events_df, c="Nigeria", rem_actor_name="",
           group_by(., actor2) %>%
           summarise(., total_deaths = sum(deaths, na.rm = FALSE))
      
+     # Add in some other selectors:
+     # Deaths by event type sums all deaths over last year
+     deaths_by_event_type <- events.wo %>%
+          ungroup(.) %>%
+          group_by(., event_type) %>%
+          summarise(., deaths = sum(fatalities, na.rm=FALSE))
+     #deaths by event and month sums all for those
+     deaths_by_event_and_month <- events.wo %>%
+          ungroup(.) %>%
+          group_by(., event_type, year, month) %>%
+          summarise(., deaths = sum(fatalities, na.rm=FALSE))
+     
+     # violence against civilian Deaths by actor 1
+     civ_deaths_by_actor1 <- events.wo %>%
+          ungroup(.) %>%
+          filter(., grepl("Violence against civilians", event_type, ignore.case=TRUE)) %>% 
+          group_by(., actor1) %>%
+          summarise(., deaths = sum(fatalities, na.rm=FALSE))
+     
+     civ_deaths_by_actor1_month <- events.wo %>%
+          ungroup(.) %>%
+          filter(., grepl("Violence against civilians", event_type, ignore.case=TRUE)) %>% 
+          group_by(., actor1, year, month) %>%
+          summarise(., deaths = sum(fatalities, na.rm=FALSE))
+     
      # build filename, use country and today's date
-     filename <- paste(c, today() ,sep="")
+     filename <- paste(c, file_date ,sep="")
      
      save("events.country","events.country.fatal","events.recent",
           "events.wo","last_year_monthly.actor1", 
           "last_year_monthly.actor2","last_year_tot.actor1",
-          "last_year_tot.actor2",file=filename)
+          "last_year_tot.actor2","deaths_by_event_type", "deaths_by_event_and_month",
+          "civ_deaths_by_actor1", "civ_deaths_by_actor1_month", file=filename)
 }
