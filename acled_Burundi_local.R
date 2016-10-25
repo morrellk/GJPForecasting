@@ -26,7 +26,7 @@ Burundi.cm.types <- Burundi.local %>%
      mutate(., country = countrycode(gwno, "cown", "country.name", warn = FALSE)) # Use 'countrycode' to add country names based on COW numeric codes
 
 # Death counts
-Burundi.cm.deaths <- Buruni.local %>%
+Burundi.cm.deaths <- Burundi.local %>%
      mutate(month = as.numeric(substr(event_date, 4, 5))) %>%  # Create month var to use in grouping
      group_by(year, month) %>%  # Define groupings from highest to lowest level; data are automatically ordered accordingly
      summarise(., deaths = sum(fatalities, na.rm=TRUE)) %>%  # get monthly death counts
