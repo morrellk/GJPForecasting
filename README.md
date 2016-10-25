@@ -45,5 +45,30 @@ tally of fatalities by actor1 (perpetrator) and actor2 (victim)
      + doesn't account for consensus forecast
      + doesn't track over time
      
+* acled_Burundi_local.R
+     + Script to read in file containing Burundi local data sources and process
+     + input: .csv file of Burundi data (hardcoded - will need to update)
+     + Basically does what the acled_importer does, but for a specific .csv file.
+     
+* acled_local_country_mk.R
+     + Script to process local data.  Functions the same as acled_country_mk.R
+     
+* acled_asia_import.R
+     + Importer for the Asia data file
+     
+* asia_country_mk.R
+     + Process ACLED data for Asia, slight differences in the data storage from 
+     + Africa data.
+     
+* acled_DRC_civ_fatal.R
+     + Script to filter the ACLED data for DRC in specific ways for an Early
+     + Warning Project question at GJ Open.  Question specifies exactly which
+     + fields to use
+     
+* acled_Ethiopia_ethnic.R
+     + Script to mark which Ethiopian events in ACLED database affect Oromo 
+     + Ethnic group or Amhara ethnic group.  Creates a csv file for those events.
+     
+     
 
 
